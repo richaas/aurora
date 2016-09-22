@@ -11,7 +11,7 @@ class basic
 	private function unauthorized()
 	{
 		header("WWW-Authenticate: Basic realm=\"$this->realm\"");
-		throw new \Exception("Unauthorized", 401);
+		throw new \Exception("unauthorized", 401);
 	}
 
 

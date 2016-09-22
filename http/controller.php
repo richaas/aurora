@@ -5,12 +5,12 @@ namespace aurora\http;
 
 class controller
 {
-	private static function checkMethod($ctrl, $method, $argc)
+	private static function checkMethod($class, $method, $argc)
 	{
-		if (!method_exists($ctrl, $method))
+		if (!method_exists($class, $method))
 			return false;
 
-		$rm = new \ReflectionMethod($ctrl, $method);
+		$rm = new \ReflectionMethod($class, $method);
 
 		if (!$rm->isPublic())
 			return false;
@@ -23,12 +23,9 @@ class controller
 	}
 
 
-	private static function reply($ctrl, $method, $args)
+	private static function reply($class, $method, $args)
 	{
-		if (!self::checkMethod($ctrl, $method, count($args)))
-			throw new \Exception("Method not allowed", 405);
-
-		$resp = call_user_func_array(array(new $ctrl, $method), $args);
+		$resp = call_user_func_array(array(new $class, $method), $args);
 		if (!isset($resp))
 			$resp = new response("", 204, array("Content-Type:"));
 
@@ -41,26 +38,39 @@ class controller
 	}
 
 
+	private static function expand(&$val, &$args, $index)
+	{
+		$val .= str_replace(array("-", "/"), array("_", "\\"), $args[$index]);
+
+		unset($args[$index]);
+	}
+
+
 	public static function request($routes)
 	{
 		$req = new request();
 
 		foreach ($routes as $rt) {
 
-                        if (preg_match($rt["expr"], $req->path, $args)) {
+                        if (!preg_match($rt["path"], $req->path, $args))
+				continue;
 
-				$method  = $req->method;
-				$args[0] = $req;
+			$class   = $rt["ctrl"];
+			$method  = $req->method;
+			$args[0] = $req;
 
-				if (isset($rt["suffix"])) {
-					$method .= $args[$rt["suffix"]];
-					unset($args[$rt["suffix"]]);
-				}
+			if (isset($rt["class"]))
+				self::expand($class, $args, $rt["class"]);
 
-				return self::reply($rt["ctrl"], $method, $args);
-			}
+			if (isset($rt["method"]))
+				self::expand($method, $args, $rt["method"]);
+
+			if (!self::checkMethod($class, $method, count($args)))
+				continue;
+
+			return self::reply($class, $method, $args);
 		}
 
-		throw new \Exception("Not found", 404);
+		throw new \Exception("not found", 404);
 	}
 }

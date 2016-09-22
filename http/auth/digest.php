@@ -56,7 +56,7 @@ class digest
 			       md5($this->secret . $ts) . dechex($ts),
 			       $stale ? ", stale=true" : ""));
 
-		throw new \Exception("Unauthorized", 401);
+		throw new \Exception("unauthorized", 401);
 	}
 
 
