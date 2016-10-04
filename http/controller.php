@@ -46,7 +46,7 @@ class controller
 	}
 
 
-	public static function request($routes)
+	public static function handleRequest($routes)
 	{
 		$req = new request();
 
@@ -68,9 +68,18 @@ class controller
 			if (!self::checkMethod($class, $method, count($args)))
 				continue;
 
-			return self::reply($class, $method, $args);
+			self::reply($class, $method, $args);
+
+			return true;
 		}
 
-		throw new \Exception("not found", 404);
+		return false;
+	}
+
+
+	public static function request($routes)
+	{
+		if (!self::handleRequest($routes))
+			throw new \Exception("not found", 404);
 	}
 }
