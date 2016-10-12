@@ -54,6 +54,22 @@ class console
 	}
 
 
+	private static function usage($cmd, $params)
+	{
+		$usage = "usage: $cmd";
+
+		foreach ($params as $param) {
+
+			if ($param->isOptional())
+				$usage .= " [" . $param->name . "]";
+			else
+				$usage .= " <" . $param->name . ">";
+		}
+
+		return $usage;
+	}
+
+
 	public function __construct($root, $base)
 	{
 		$this->root = $root;
@@ -68,11 +84,23 @@ class console
 		if (is_dir($this->path($cmd)))
 			return $this->help($cmd);
 
-		if (!is_file($this->path($cmd) . ".php"))
-			throw new \Exception($cmd . ": command not found");
-
 		$class = $this->_class($cmd);
 
-		call_user_func_array(array(new $class, "exec"), array_slice($argv, 2));
+		if (!method_exists($class, "exec"))
+			throw new \Exception($cmd . ": command not found");
+
+		$rm = new \ReflectionMethod($class, "exec");
+
+		if (!$rm->isPublic())
+			throw new \Exception($cmd . ": command not found");
+
+		$args = array_slice($argv, 2);
+		$argc = count($args);
+
+		if ($argc < $rm->getNumberOfRequiredParameters() ||
+		    $argc > $rm->getNumberOfParameters())
+			throw new \Exception(self::usage($cmd, $rm->getParameters()));
+
+		call_user_func_array(array(new $class, "exec"), $args);
 	}
 }
