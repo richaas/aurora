@@ -31,16 +31,15 @@ class digest
 
 	private function checkNonce($nonce)
 	{
-		$nkey = substr($nonce, 0, 32);
-		$ts   = hexdec(substr($nonce, 32));
-		$ckey = md5($this->secret . $ts);
+		$ne = explode(":", base64_decode($nonce));
 
-		if ($nkey !== $ckey)
+		if (count($ne) !== 2)
 			return false;
 
-		$age = time() - $ts;
+		if ($ne[1] !== md5($ne[0] . ":" . $this->secret))
+			return false;
 
-		if ($age < 0 || $age > $this->nonceExpires)
+		if ($ne[0] < time())
 			return false;
 
 		return true;
@@ -49,11 +48,11 @@ class digest
 
         private function unauthorized($stale=false)
 	{
-		$ts = time();
+		$ts = time() + $this->nonceExpires;
 
 		header(sprintf("WWW-Authenticate: Digest realm=\"%s\", nonce=\"%s\", qop=\"auth\"%s",
 			       $this->realm,
-			       md5($this->secret . $ts) . dechex($ts),
+			       base64_encode($ts . ":" . md5($ts . ":" . $this->secret)),
 			       $stale ? ", stale=true" : ""));
 
 		throw new \Exception("unauthorized", 401);
