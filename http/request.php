@@ -8,8 +8,11 @@ class request
 	public $client;
 	public $method;
 	public $path;
+	public $uri;
 	public $param;
 	public $host;
+	public $scheme;
+	public $referer;
 	public $content;
 
 
@@ -18,11 +21,14 @@ class request
 		$uri  = $_SERVER["REQUEST_URI"];
 		$path = strstr($uri, "?", true);
 
-		$this->client = $_SERVER["REMOTE_ADDR"];
-		$this->method = strtolower($_SERVER["REQUEST_METHOD"]);
-		$this->path   = $path ? $path : $uri;
-		$this->param  = (object)$_REQUEST;
-		$this->host   = $_SERVER["HTTP_HOST"];
+		$this->client  = $_SERVER["REMOTE_ADDR"];
+		$this->method  = strtolower($_SERVER["REQUEST_METHOD"]);
+		$this->path    = $path ? $path : $uri;
+		$this->uri     = $uri;
+		$this->param   = (object)$_REQUEST;
+		$this->host    = $_SERVER["HTTP_HOST"];
+		$this->scheme  = (isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] !== "off") ? "https" : "http";
+		$this->referer = isset($_SERVER["HTTP_REFERER"]) ? $_SERVER["HTTP_REFERER"] : NULL;
 
 		if (isset($_SERVER["CONTENT_TYPE"])) {
 
