@@ -92,7 +92,7 @@ class digest
 		if (!$res)
 			$this->unauthorized();
 
-		$ha2 = md5($_SERVER["REQUEST_METHOD"] . ":" . $_SERVER["REQUEST_URI"]);
+		$ha2 = md5($_SERVER["REQUEST_METHOD"] . ":" . $auth->uri);
 
 		if ($auth->qop)
 			$digest = md5("$ha1:$auth->nonce:$auth->nc:$auth->cnonce:$auth->qop:$ha2");
