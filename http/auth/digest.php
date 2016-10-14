@@ -5,6 +5,7 @@ namespace aurora\http\auth;
 
 class digest
 {
+	private $header = "WWW-Authenticate";
 	private $secret;
 	private $realm;
 	private $nonceExpires;
@@ -50,7 +51,8 @@ class digest
 	{
 		$ts = time() + $this->nonceExpires;
 
-		header(sprintf("WWW-Authenticate: Digest realm=\"%s\", nonce=\"%s\", qop=\"auth\"%s",
+		header(sprintf("%s: Digest realm=\"%s\", nonce=\"%s\", qop=\"auth\"%s",
+			       $this->header,
 			       $this->realm,
 			       base64_encode($ts . ":" . md5($ts . ":" . $this->secret)),
 			       $stale ? ", stale=true" : ""));
@@ -64,6 +66,12 @@ class digest
 		$this->secret = $secret;
 		$this->realm  = $realm;
 		$this->nonceExpires = $nonceExpires;
+	}
+
+
+	public function setHeader($header)
+	{
+		$this->header = $header;
 	}
 
 
