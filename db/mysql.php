@@ -83,6 +83,12 @@ class mysql
 		if (!$this->conn->rollback())
 			throw new \Exception($this->conn->error);
 	}
+
+
+	public function insertId()
+	{
+		return $this->conn->insert_id;
+	}
 }
 
 ?>
