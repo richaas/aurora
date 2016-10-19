@@ -90,5 +90,3 @@ class mysql
 		return $this->conn->insert_id;
 	}
 }
-
-?>

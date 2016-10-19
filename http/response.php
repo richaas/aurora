@@ -17,5 +17,3 @@ class response
 		$this->headers = $headers;
 	}
 }
-
-?>
