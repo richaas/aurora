@@ -34,7 +34,10 @@ class controller
 		foreach ($resp->headers as $value)
 			header($value);
 
-		echo $resp->content;
+		if ($resp->filename)
+			readfile($resp->filename);
+		else
+			echo $resp->content;
 	}
 
 
