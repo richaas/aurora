@@ -5,17 +5,21 @@ namespace aurora\http;
 
 class response
 {
-	public $content;
+	private $content;
 	public $status;
 	public $headers;
-	public $filename;
 
 
-	function __construct($content="", $status=200, $headers=array(), $filename=NULL)
+	public function __construct($content="", $status=200, $headers=array())
 	{
 		$this->content  = $content;
 		$this->status   = $status;
 		$this->headers  = $headers;
-		$this->filename = $filename;
+	}
+
+
+	public function sendContent()
+	{
+		echo $this->content;
 	}
 }
