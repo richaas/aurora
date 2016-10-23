@@ -50,9 +50,11 @@ class controller
 	{
 		$req = new request();
 
+		$path = rawurldecode($req->path);
+
 		foreach ($routes as $rt) {
 
-                        if (!preg_match($rt["path"], $req->path, $args))
+                        if (!preg_match($rt["path"], $path, $args))
 				continue;
 
 			$class   = $rt["ctrl"];
