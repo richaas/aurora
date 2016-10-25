@@ -29,6 +29,13 @@ class file
 	}
 
 
+	public static function touch($filename)
+	{
+		if (!touch($filename))
+			throw new \Exception(error_get_last()["message"]);
+	}
+
+
 	public static function unlink($filename)
 	{
 		if (!file_exists($filename))
