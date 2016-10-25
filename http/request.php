@@ -37,7 +37,9 @@ class request
 			switch ($this->content->type) {
 
 			case "application/json":
-				$this->param = json_decode(file_get_contents("php://input"));
+				$param = json_decode(file_get_contents("php://input"));
+				if ($param !== NULL)
+					$this->param = $param;
 				break;
 			}
 		}
