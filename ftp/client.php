@@ -49,6 +49,7 @@ class client
 		curl_setopt($this->curl, CURLOPT_URL, $url);
 		curl_setopt($this->curl, CURLOPT_UPLOAD, true);
 		curl_setopt($this->curl, CURLOPT_INFILE, $fp);
+		curl_setopt($this->curl, CURLOPT_FTP_SSL, CURLFTPSSL_TRY);
 
 		$res = curl_exec($this->curl);
 
