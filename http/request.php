@@ -30,7 +30,7 @@ class request
 		$this->scheme  = (isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] !== "off") ? "https" : "http";
 		$this->referer = isset($_SERVER["HTTP_REFERER"]) ? $_SERVER["HTTP_REFERER"] : NULL;
 
-		if (empty($_REQUEST) && isset($_SERVER["CONTENT_TYPE"])) {
+		if (isset($_SERVER["CONTENT_TYPE"])) {
 
 			$this->content = client::decodeContentType($_SERVER["CONTENT_TYPE"]);
 
