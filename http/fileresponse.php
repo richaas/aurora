@@ -10,6 +10,17 @@ class fileresponse extends response
 	private $maxlen;
 
 
+	private static function lastModified($mtime)
+	{
+		$date = new \DateTime();
+
+		$date->setTimestamp($mtime);
+		$date->setTimezone(new \DateTimeZone("UTC"));
+
+		return $date->format("D, d M Y H:i:s") . " GMT";
+	}
+
+
 	private function setRange($size, $etag)
 	{
 		if ($size < 1)
@@ -77,6 +88,7 @@ class fileresponse extends response
 		$size = $stat["size"];
 		$etag = sprintf("\"%x-%x-%x\"", $stat["ino"], $size, $stat["mtime"]);
 
+		$this->headers[] = "Last-Modified: " . self::lastModified($stat["mtime"]);
 		$this->headers[] = "Content-Type: " . $mimeType;
 		$this->headers[] = "Accept-Ranges: bytes";
 		$this->headers[] = "ETag: " . $etag;
