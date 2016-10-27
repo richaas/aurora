@@ -5,6 +5,12 @@ namespace aurora\http;
 
 class controller
 {
+	const arg  = "{arg}";
+	const ctrl = "{ctrl}";
+	const met  = "{met}";
+	const root = "{root}";
+
+
 	private static function checkMethod($class, $method, $argc)
 	{
 		if (!method_exists($class, $method))
@@ -38,50 +44,61 @@ class controller
 	}
 
 
-	private static function expand(&$val, &$args, $index)
-	{
-		$val .= str_replace(array("-", "/"), array("_", "\\"), $args[$index]);
-
-		unset($args[$index]);
-	}
-
-
-	public static function handleRequest($routes)
+	public static function handleRequest($routes, $ctrlRoot="ctrl")
 	{
 		$req = new request();
 
-		$path = rawurldecode($req->path);
+		$nodes  = explode("/", substr($req->path, 1));
+		$method = $req->method;
+		$args   = array($req);
+		$route  = $routes;
+		$ctrl   = "";
 
-		foreach ($routes as $rt) {
+		foreach ($nodes as $node) {
 
-                        if (!preg_match($rt["path"], $path, $args))
-				continue;
+			$node = rawurldecode($node);
 
-			$class   = $rt["ctrl"];
-			$method  = $req->method;
-			$args[0] = $req;
-
-			if (isset($rt["class"]))
-				self::expand($class, $args, $rt["class"]);
-
-			if (isset($rt["method"]))
-				self::expand($method, $args, $rt["method"]);
-
-			if (!self::checkMethod($class, $method, count($args)))
-				continue;
-
-			self::reply($class, $method, $args);
-
-			return true;
+			if (isset($route[$node])) {
+				$route = $route[$node];
+			}
+			else if (isset($route[self::arg])) {
+				$route  = $route[self::arg];
+				$args[] = $node;
+			}
+			else if (isset($route[self::ctrl])) {
+				$route = $route[self::ctrl];
+				$ctrl .= "\\" . preg_replace("/[^\w]/", "", $node);
+			}
+			else if (isset($route[self::met])) {
+				$route   = $route[self::met];
+				$method .= preg_replace("/[^\w]/", "", $node);
+			}
+			else {
+				return false;
+			}
 		}
 
-		return false;
+		if (is_array($route)) {
+			if (!isset($route[self::root]))
+				return false;
+
+			$route = $route[self::root];
+		}
+
+		$class = $ctrlRoot . "\\" . $route . $ctrl;
+
+		if (!self::checkMethod($class, $method, count($args)))
+			return false;
+
+		self::reply($class, $method, $args);
+
+		return true;
 	}
 
 
-	public static function request($routes)
+	public static function request($routes, $ctrlRoot="ctrl")
 	{
-		if (!self::handleRequest($routes))
+		if (!self::handleRequest($routes, $ctrlRoot))
 			throw new \Exception("not found", 404);
 	}
 }
