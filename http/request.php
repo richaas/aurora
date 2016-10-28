@@ -51,7 +51,7 @@ class request
 		if (property_exists($this->param, $key))
 			return $this->param->$key;
 		else if (func_num_args() == 1)
-			throw new \Exception("$key must be provided", 400);
+			throw new \Exception("parameter $key must be provided", 400);
 		else
 			return $placeholder;
 	}
