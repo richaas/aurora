@@ -50,6 +50,7 @@ class client
 		curl_setopt($this->curl, CURLOPT_UPLOAD, true);
 		curl_setopt($this->curl, CURLOPT_INFILE, $fp);
 		curl_setopt($this->curl, CURLOPT_FTP_SSL, CURLFTPSSL_TRY);
+		curl_setopt($this->curl, CURLOPT_FTP_CREATE_MISSING_DIRS, true);
 
 		$res = curl_exec($this->curl);
 
