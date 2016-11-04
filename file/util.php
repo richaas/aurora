@@ -3,7 +3,7 @@
 namespace aurora\file;
 
 
-class file
+class util
 {
 	public static function link($target, $link)
 	{
