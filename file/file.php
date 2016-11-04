@@ -19,6 +19,13 @@ class file
 	}
 
 
+	public static function rename($old, $new)
+	{
+		if (!rename($old, $new))
+			throw new \Exception(error_get_last()["message"]);
+	}
+
+
 	public static function scandir($pathname, $sorting_order=SCANDIR_SORT_ASCENDING)
 	{
 		$ret = scandir($pathname, $sorting_order);
