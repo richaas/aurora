@@ -6,9 +6,16 @@ namespace aurora\mail;
 class message
 {
 	private $to;
+	private $from;
 	private $subject;
 	private $content;
 	private $headers;
+
+
+	private static function normalize($text)
+	{
+		return preg_replace("/(\r\n|\r|\n)/ms", "\r\n", $text);
+	}
 
 
 	private static function encode($value)
@@ -75,15 +82,17 @@ class message
 
 	public function setFrom($from)
 	{
-		$this->setHeader("From", $from);
+		$this->from = $from;
 	}
 
 
-	public function setContent($content, $contentType="text/plain")
+	public function setContent($content, $contentType="text/plain", $charset="utf-8")
 	{
-		$this->setHeader("Content-Type", $contentType);
+		$this->setHeader("MIME-Version", "1.0");
+		$this->setHeader("Content-Type", $contentType . "; charset=" . $charset);
+		$this->setHeader("Content-Transfer-Encoding", "quoted-printable");
 
-		$this->content = wordwrap($content, 70, "\r\n");
+		$this->content = quoted_printable_encode(self::normalize($content));
 	}
 
 
@@ -94,6 +103,7 @@ class message
 		foreach ($this->headers as $name => $value)
 			$headers .= "$name: $value\r\n";
 
-		mail($this->to, $this->subject, $this->content, $headers);
+		mail($this->to, $this->subject, $this->content, $headers,
+		     "-F '' -f " . $this->from);
 	}
 }
