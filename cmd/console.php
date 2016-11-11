@@ -2,6 +2,8 @@
 
 namespace aurora\cmd;
 
+use Exception;
+
 
 class console
 {
@@ -47,9 +49,7 @@ class console
 			$cmd = self::cmd($path, $res[1]);
 			$class = $this->_class($cmd);
 
-			$inst = new $class;
-
-			printf("%-20s%s\n", $cmd, $inst->help());
+			printf("%-30s%s\n", $cmd, $class::desc);
                 }
 	}
 
@@ -87,19 +87,19 @@ class console
 		$class = $this->_class($cmd);
 
 		if (!method_exists($class, "exec"))
-			throw new \Exception($cmd . ": command not found");
+			throw new Exception($cmd . ": command not found");
 
 		$rm = new \ReflectionMethod($class, "exec");
 
 		if (!$rm->isPublic())
-			throw new \Exception($cmd . ": command not found");
+			throw new Exception($cmd . ": command not found");
 
 		$args = array_slice($argv, 2);
 		$argc = count($args);
 
 		if ($argc < $rm->getNumberOfRequiredParameters() ||
 		    $argc > $rm->getNumberOfParameters())
-			throw new \Exception(self::usage($cmd, $rm->getParameters()));
+			throw new Exception(self::usage($cmd, $rm->getParameters()));
 
 		call_user_func_array(array(new $class, "exec"), $args);
 	}
