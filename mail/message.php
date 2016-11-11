@@ -2,6 +2,8 @@
 
 namespace aurora\mail;
 
+use Exception;
+
 
 class message
 {
@@ -103,7 +105,9 @@ class message
 		foreach ($this->headers as $name => $value)
 			$headers .= "$name: $value\r\n";
 
-		mail($this->to, $this->subject, $this->content, $headers,
-		     "-F '' -f " . $this->from);
+		$params = "-F '' -f " . $this->from;
+
+		if (!mail($this->to, $this->subject, $this->content, $headers, $params))
+			throw new Exception("unable to send mail message");
 	}
 }
