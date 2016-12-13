@@ -2,27 +2,29 @@
 
 namespace aurora\file;
 
+use Exception;
+
 
 class util
 {
 	public static function link($target, $link)
 	{
 		if (!link($target, $link))
-			throw new \Exception("link($target, $link): " . error_get_last()["message"]);
+			throw new Exception("link($target, $link): " . error_get_last()["message"]);
 	}
 
 
 	public static function mkdir($pathname, $mode=0777, $recursive=false)
 	{
 		if (!mkdir($pathname, $mode, $recursive))
-			throw new \Exception("mkdir($pathname): " . error_get_last()["message"]);
+			throw new Exception("mkdir($pathname): " . error_get_last()["message"]);
 	}
 
 
 	public static function rename($old, $new)
 	{
 		if (!rename($old, $new))
-			throw new \Exception(error_get_last()["message"]);
+			throw new Exception(error_get_last()["message"]);
 	}
 
 
@@ -30,7 +32,7 @@ class util
 	{
 		$ret = scandir($pathname, $sorting_order);
 		if ($ret === false)
-			throw new \Exception("scandir($pathname): " . error_get_last()["message"]);
+			throw new Exception("scandir($pathname): " . error_get_last()["message"]);
 
 		return $ret;
 	}
@@ -39,7 +41,7 @@ class util
 	public static function touch($filename)
 	{
 		if (!touch($filename))
-			throw new \Exception(error_get_last()["message"]);
+			throw new Exception(error_get_last()["message"]);
 	}
 
 
@@ -49,6 +51,6 @@ class util
 			return;
 
 		if (!unlink($filename))
-			throw new \Exception(error_get_last()["message"]);
+			throw new Exception(error_get_last()["message"]);
 	}
 }
