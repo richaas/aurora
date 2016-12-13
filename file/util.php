@@ -53,4 +53,21 @@ class util
 		if (!unlink($filename))
 			throw new Exception(error_get_last()["message"]);
 	}
+
+
+	public static function file_put_contents($filename, $data, $flags=0)
+	{
+		if (file_put_contents($filename, $data, $flags) === false)
+			throw new Exception(error_get_last()["message"]);
+	}
+
+
+	public static function file_get_contents($filename)
+	{
+		$data = file_get_contents($filename);
+		if ($data === false)
+			throw new Exception(error_get_last()["message"]);
+
+		return $data;
+	}
 }
