@@ -80,7 +80,7 @@ class entity
 	}
 
 
-	public function select($id, $join=array())
+	public function select($id, $join=array(), $handleNotFound=false)
 	{
 		$entity = $this->entity();
 
@@ -98,8 +98,12 @@ class entity
 		$sql2 = substr($sql2, 0, -4);
 
 		$res = db::conn()->query($sql1 . $sql2, $id);
-		if (count($res) < 1)
-			throw new \Exception("$entity not found", 404);
+		if (count($res) < 1) {
+			if ($handleNotFound)
+				return NULL;
+			else
+				throw new \Exception("$entity not found", 404);
+		}
 
 		$this->storeResult($res[0]);
 
