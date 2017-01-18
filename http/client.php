@@ -31,6 +31,12 @@ class client
 	}
 
 
+	public function setVerifyHost($verify)
+	{
+		curl_setopt($this->curl, CURLOPT_SSL_VERIFYHOST, $verify);
+	}
+
+
 	public function setVerifyPeer($verify)
 	{
 		curl_setopt($this->curl, CURLOPT_SSL_VERIFYPEER, $verify);
