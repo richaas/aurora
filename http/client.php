@@ -125,7 +125,7 @@ class client
 		switch ($contentType) {
 
 		case "application/json":
-			return json_encode($data, JSON_NUMERIC_CHECK);
+			return json_encode($data);
 
 		case "application/x-www-form-urlencoded":
 			return $this->encodeParams($data);
