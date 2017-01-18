@@ -151,7 +151,7 @@ class client
 	{
 		$fields = explode(";", $value);
 
-		$ctype["type"] = trim($fields[0]);
+		$ctype["type"] = strtolower(trim($fields[0]));
 
 		unset($fields[0]);
 
