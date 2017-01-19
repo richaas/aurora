@@ -13,10 +13,12 @@ class controller
 
 	private static function checkMethod($class, $method, $argc)
 	{
-		if (!method_exists($class, $method))
+		try {
+			$rm = new \ReflectionMethod($class, $method);
+		}
+		catch (\ReflectionException $ex) {
 			return false;
-
-		$rm = new \ReflectionMethod($class, $method);
+		}
 
 		if (!$rm->isPublic())
 			return false;

@@ -86,10 +86,12 @@ class console
 
 		$class = $this->_class($cmd);
 
-		if (!method_exists($class, "exec"))
+		try {
+			$rm = new \ReflectionMethod($class, "exec");
+		}
+		catch (\ReflectionException $ex) {
 			throw new Exception($cmd . ": command not found");
-
-		$rm = new \ReflectionMethod($class, "exec");
+		}
 
 		if (!$rm->isPublic())
 			throw new Exception($cmd . ": command not found");
