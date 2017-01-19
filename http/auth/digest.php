@@ -23,7 +23,7 @@ class digest
 
 			$key = trim($ent[0]);
 
-			$params[$key] = trim($ent[1], "\"");
+			$params[$key] = trim(trim($ent[1]), "\"");
 		}
 
 		return (object)$params;
