@@ -15,16 +15,11 @@ class digest
 	{
 		$params = array();
 
-		$comp = explode(",", $hdr);
+		preg_match_all('/(\w+)\s*=\s*(?:"((?:[^"\\\\]|\\\\.)*)"|([^\s,]*))/s',
+			       $hdr, $matches, PREG_SET_ORDER);
 
-		foreach($comp as $val) {
-
-			$ent = explode("=", $val, 2);
-
-			$key = trim($ent[0]);
-
-			$params[$key] = trim(trim($ent[1]), "\"");
-		}
+		foreach ($matches as $ent)
+			$params[$ent[1]] = isset($ent[3]) ? $ent[3] : $ent[2];
 
 		return (object)$params;
 	}
