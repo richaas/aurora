@@ -89,7 +89,7 @@ class digest
 
 		$ha2 = md5($_SERVER["REQUEST_METHOD"] . ":" . $auth->uri);
 
-		if ($auth->qop)
+		if (isset($auth->qop))
 			$digest = md5("$ha1:$auth->nonce:$auth->nc:$auth->cnonce:$auth->qop:$ha2");
 		else
 			$digest = md5("$ha1:$auth->nonce:$ha2");
