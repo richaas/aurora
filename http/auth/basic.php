@@ -6,13 +6,8 @@ namespace aurora\http\auth;
 class basic
 {
 	private $realm;
-
-
-	private function unauthorized()
-	{
-		header("WWW-Authenticate: Basic realm=\"$this->realm\"");
-		throw new \Exception("unauthorized", 401);
-	}
+	public $username;
+	public $password;
 
 
 	public function __construct($realm)
@@ -21,15 +16,20 @@ class basic
 	}
 
 
-	public function authenticate($func)
+	public function decode()
 	{
 		if (!isset($_SERVER["PHP_AUTH_USER"]))
-			$this->unauthorized();
+			return false;
 
-		$res = $func($_SERVER["PHP_AUTH_USER"], $_SERVER["PHP_AUTH_PW"]);
-		if (!$res)
-			$this->unauthorized();
+		$this->username = $_SERVER["PHP_AUTH_USER"];
+		$this->password = $_SERVER["PHP_AUTH_PW"];
 
-		return $res;
+		return true;
+	}
+
+
+	public function header()
+	{
+		return sprintf("Basic realm=\"%s\"", $this->realm);
 	}
 }
