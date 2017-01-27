@@ -50,7 +50,7 @@ class console
 			$class = $this->_class($cmd);
 
 			printf("%-30s%s\n", $cmd, $class::desc);
-                }
+		}
 	}
 
 

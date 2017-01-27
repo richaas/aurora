@@ -26,7 +26,7 @@ class fileresponse extends response
 		if ($size < 1)
 			return false;
 
-		if(!isset($_SERVER["HTTP_RANGE"]))
+		if (!isset($_SERVER["HTTP_RANGE"]))
 			return false;
 
 		if (isset($_SERVER["HTTP_IF_RANGE"]) && $_SERVER["HTTP_IF_RANGE"] !== $etag)
@@ -55,7 +55,7 @@ class fileresponse extends response
 		else
 			return false;
 
-                if ($start > $end)
+		if ($start > $end)
 			return false;
 
 		$this->offset = $start;

@@ -47,7 +47,7 @@ class request
 
 
 	function get($key, $placeholder=NULL)
-	{		
+	{
 		if (property_exists($this->param, $key))
 			return $this->param->$key;
 		else if (func_num_args() == 1)
