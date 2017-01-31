@@ -5,34 +5,28 @@ namespace aurora\http\auth;
 
 class digest
 {
-	private $header = "WWW-Authenticate";
-	private $secret;
-	private $realm;
-	private $nonceExpires;
+	private $_secret;
+	private $_realm;
+	private $_nonceExpires;
+	private $_stale = false;
+	public $username;
+	public $realm;
+	public $nonce;
+	public $uri;
+	public $response;
+	public $qop;
+	public $nc;
+	public $cnonce;
 
 
-	private function decode($hdr)
+	private function checkNonce()
 	{
-		$params = array();
-
-		preg_match_all('/(\w+)\s*=\s*(?:"((?:[^"\\\\]|\\\\.)*)"|([^\s,]*))/s',
-			       $hdr, $matches, PREG_SET_ORDER);
-
-		foreach ($matches as $ent)
-			$params[$ent[1]] = isset($ent[3]) ? $ent[3] : $ent[2];
-
-		return (object)$params;
-	}
-
-
-	private function checkNonce($nonce)
-	{
-		$ne = explode(":", base64_decode($nonce));
+		$ne = explode(":", base64_decode($this->nonce));
 
 		if (count($ne) !== 2)
 			return false;
 
-		if ($ne[1] !== md5($ne[0] . ":" . $this->secret))
+		if ($ne[1] !== md5($ne[0] . ":" . $this->_secret))
 			return false;
 
 		if ($ne[0] < time())
@@ -42,61 +36,60 @@ class digest
 	}
 
 
-        private function unauthorized($stale=false)
-	{
-		$ts = time() + $this->nonceExpires;
-
-		header(sprintf("%s: Digest realm=\"%s\", nonce=\"%s\", qop=\"auth\"%s",
-			       $this->header,
-			       $this->realm,
-			       base64_encode($ts . ":" . md5($ts . ":" . $this->secret)),
-			       $stale ? ", stale=true" : ""));
-
-		throw new \Exception("unauthorized", 401);
-	}
-
-
 	public function __construct($secret, $realm, $nonceExpires=300)
 	{
-		$this->secret = $secret;
-		$this->realm  = $realm;
-		$this->nonceExpires = $nonceExpires;
+		$this->_secret = $secret;
+		$this->_realm  = $realm;
+		$this->_nonceExpires = $nonceExpires;
 	}
 
 
-	public function setHeader($header)
-	{
-		$this->header = $header;
-	}
-
-
-	public function authenticate($func)
+	public function decode()
 	{
 		if (!isset($_SERVER["PHP_AUTH_DIGEST"]))
-			$this->unauthorized();
+			return false;
 
-		$auth = $this->decode($_SERVER["PHP_AUTH_DIGEST"]);
+		if (!preg_match_all('/([a-z]+)\s*=\s*(?:"((?:[^"\\\\]|\\\\.)*)"|([^\s,]*))/si',
+				    $_SERVER["PHP_AUTH_DIGEST"], $matches, PREG_SET_ORDER))
+			return false;
 
-		if ($auth->realm != $this->realm)
-			$this->unauthorized();
+		foreach ($matches as $ent) {
+			$key = strtolower($ent[1]);
+			$this->$key = isset($ent[3]) ? $ent[3] : $ent[2];
+		}
 
-		if (!$this->checkNonce($auth->nonce))
-			$this->unauthorized(true);
+		if ($this->realm != $this->_realm)
+			return false;
 
-		$res = $func($auth->username, $ha1);
-		if (!$res)
-			$this->unauthorized();
+		if (!$this->checkNonce()) {
+			$this->_stale = true;
+			return false;
+		}
 
-		$ha2 = md5($_SERVER["REQUEST_METHOD"] . ":" . $auth->uri);
+		return true;
+	}
 
-		if (isset($auth->qop))
-			$digest = md5("$ha1:$auth->nonce:$auth->nc:$auth->cnonce:$auth->qop:$ha2");
+
+	public function validate($ha1)
+	{
+		$ha2 = md5($_SERVER["REQUEST_METHOD"] . ":" . $this->uri);
+
+		if (isset($this->qop))
+			$digest = md5("$ha1:$this->nonce:$this->nc:$this->cnonce:$this->qop:$ha2");
 		else
-			$digest = md5("$ha1:$auth->nonce:$ha2");
+			$digest = md5("$ha1:$this->nonce:$ha2");
 
-		if ($auth->response !== $digest)
-			$this->unauthorized();
+		return ($this->response === $digest);
+	}
 
-		return $res;
+
+	public function header()
+	{
+		$ts = time() + $this->_nonceExpires;
+
+		return sprintf("Digest realm=\"%s\", nonce=\"%s\", qop=\"auth\"%s",
+			       $this->_realm,
+			       base64_encode($ts . ":" . md5($ts . ":" . $this->_secret)),
+			       $this->_stale ? ", stale=true" : "");
 	}
 }
