@@ -30,6 +30,9 @@ class aes
 	{
 		$raw = base64_decode($data);
 
+		if (strlen($raw) < self::ivsize)
+			return false;
+
 		$iv = substr($raw, -self::ivsize);
 
 		return openssl_decrypt(substr($raw, 0, -self::ivsize), self::method,
