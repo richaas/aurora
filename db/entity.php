@@ -42,7 +42,7 @@ class entity
 	{
 		foreach ($this as $key => $value) {
 
-			if (is_object($value)) {
+			if (is_object($value) && get_parent_class($value) === "aurora\\db\\entity") {
 
 				$id = $key . "_id";
 
