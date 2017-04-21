@@ -66,4 +66,24 @@ class request
 
 		return true;
 	}
+
+
+	function file($path, $key, $placeholder=NULL)
+	{
+		if (isset($_FILES[$key])) {
+
+			$file = (object)$_FILES[$key];
+
+			$filename = preg_replace("/[^\w\.\-]/", "", basename($file->name));
+
+			if (!move_uploaded_file($file->tmp_name, $path . "/" . $filename))
+				throw new \Exception("file upload error: " . error_get_last()["message"]);
+
+			return $filename;
+		}
+		else if (func_num_args() == 2)
+			throw new \Exception("file $key must be provided", 400);
+		else
+			return $placeholder;
+	}
 }
