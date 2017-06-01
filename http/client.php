@@ -43,10 +43,10 @@ class client
 	}
 
 
-	public function setCredentials($username, $password)
+	public function setCredentials($username, $password, $method=CURLAUTH_ANY)
 	{
 		curl_setopt($this->curl, CURLOPT_USERPWD, $username . ":" . $password);
-		curl_setopt($this->curl, CURLOPT_HTTPAUTH, CURLAUTH_ANY);
+		curl_setopt($this->curl, CURLOPT_HTTPAUTH, $method);
 	}
 
 
