@@ -2,6 +2,7 @@
 
 namespace aurora\mail;
 
+use aurora\mime\content;
 use Exception;
 
 
@@ -12,12 +13,6 @@ class message
 	private $subject;
 	private $content;
 	private $headers;
-
-
-	private static function normalize($text)
-	{
-		return preg_replace("/(\r\n|\r|\n)/ms", "\r\n", $text);
-	}
 
 
 	private static function encode($value)
@@ -88,13 +83,14 @@ class message
 	}
 
 
-	public function setContent($content, $contentType="text/plain", $charset="utf-8")
+	public function setContent($content)
 	{
-		$this->setHeader("MIME-Version", "1.0");
-		$this->setHeader("Content-Type", $contentType . "; charset=" . $charset);
-		$this->setHeader("Content-Transfer-Encoding", "quoted-printable");
+		if (is_string($content))
+			$content = content::text($content);
 
-		$this->content = quoted_printable_encode(self::normalize($content));
+		$this->setHeader("MIME-Version", "1.0");
+		$this->headers += $content->headers;
+		$this->content = $content->data;
 	}
 
 
