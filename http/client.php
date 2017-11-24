@@ -94,8 +94,22 @@ class client
 		if ($data) {
 			curl_setopt($this->curl, CURLOPT_HTTPHEADER,
 				    array_merge($this->headers, array("Content-Type: $contentType")));
-			curl_setopt($this->curl, CURLOPT_POSTFIELDS,
-				    $this->encodeData($data, $contentType));
+
+			if (is_resource($data)) {
+
+				curl_setopt($this->curl, CURLOPT_UPLOAD, true);
+				curl_setopt($this->curl, CURLOPT_INFILE, $data);
+
+				$stat = fstat($data);
+
+				if ($stat && ($stat["mode"] & 0x8000))
+					curl_setopt($this->curl, CURLOPT_INFILESIZE, $stat["size"]);
+			}
+			else {
+				curl_setopt($this->curl, CURLOPT_UPLOAD, false);
+				curl_setopt($this->curl, CURLOPT_POSTFIELDS,
+					    $this->encodeData($data, $contentType));
+			}
 		}
 		else {
 			curl_setopt($this->curl, CURLOPT_HTTPHEADER, $this->headers);
