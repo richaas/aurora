@@ -130,6 +130,9 @@ class client
 		case "application/x-www-form-urlencoded":
 			return $this->encodeParams($data);
 
+		case "multipart/form-data":
+			return $data;
+
 		default:
 			throw new \Exception("unsupported content-type: $contentType");
 		}
