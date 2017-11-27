@@ -91,12 +91,15 @@ class client
 
 	private function request($method, $url, $data=NULL, $contentType=NULL)
 	{
+		$upload = false;
+
 		if ($data) {
 			curl_setopt($this->curl, CURLOPT_HTTPHEADER,
 				    array_merge($this->headers, array("Content-Type: $contentType")));
 
 			if (is_resource($data)) {
 
+				$upload = true;
 				curl_setopt($this->curl, CURLOPT_UPLOAD, true);
 				curl_setopt($this->curl, CURLOPT_INFILE, $data);
 
@@ -106,7 +109,6 @@ class client
 					curl_setopt($this->curl, CURLOPT_INFILESIZE, $stat["size"]);
 			}
 			else {
-				curl_setopt($this->curl, CURLOPT_UPLOAD, false);
 				curl_setopt($this->curl, CURLOPT_POSTFIELDS,
 					    $this->encodeData($data, $contentType));
 			}
@@ -120,6 +122,10 @@ class client
 		curl_setopt($this->curl, CURLOPT_URL, $url);
 
 		$this->data = curl_exec($this->curl);
+		if ($upload) {
+			curl_setopt($this->curl, CURLOPT_UPLOAD, false);
+			curl_setopt($this->curl, CURLOPT_INFILE, NULL);
+		}
 		if ($this->data === false)
 			throw new \Exception(curl_error($this->curl));
 
