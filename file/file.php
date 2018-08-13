@@ -39,10 +39,13 @@ class file
 	}
 
 
-	public function write($data)
+	public function write($data, $length=PHP_INT_MAX)
 	{
-		if (fwrite($this->fp, $data) === false)
+		$ret = fwrite($this->fp, $data, $length);
+		if ($ret === false)
 			throw new \Exception(error_get_last()["message"]);
+
+		return $ret;
 	}
 
 
