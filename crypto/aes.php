@@ -60,13 +60,12 @@ class aes
 
 	public static function decryptFile($path, $key)
 	{
-		$dstPath = rtrim($path, "_");
-		$src = new file($path, "r");
-		$dst = new file($dstPath . "~", "w");
+		$src = new file($path . "_", "r");
+		$dst = new file($path . "~", "w");
 
 		while (strlen($data = $src->read(self::blocksize)))
 			$dst->write(self::decrypt($data, $key, true));
 
-		futl::rename($dstPath . "~", $dstPath);
+		futl::rename($path . "~", $path);
 	}
 }
