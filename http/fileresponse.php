@@ -5,9 +5,9 @@ namespace aurora\http;
 
 class fileresponse extends response
 {
-	private $filename;
-	private $offset;
-	private $maxlen;
+	protected $filename;
+	protected $offset;
+	protected $maxlen;
 
 
 	private static function lastModified($mtime)
@@ -69,6 +69,23 @@ class fileresponse extends response
 	}
 
 
+	protected function setHeaders($mimeType, $size, $inode, $mtime)
+	{
+		$etag = sprintf("\"%x-%x-%x\"", $inode, $size, $mtime);
+
+		$this->headers[] = "Last-Modified: " . self::lastModified($mtime);
+		$this->headers[] = "Content-Type: " . $mimeType;
+		$this->headers[] = "Accept-Ranges: bytes";
+		$this->headers[] = "ETag: " . $etag;
+
+		$this->offset = 0;
+		$this->maxlen = -1;
+
+		if (!$this->setRange($size, $etag))
+			$this->headers[] = "Content-Length: " . $size;
+	}
+
+
 	public function __construct($filename, $status=200, $headers=array(), $mimeType=NULL)
 	{
 		$this->filename = $filename;
@@ -85,19 +102,7 @@ class fileresponse extends response
 				$mimeType = "application/octet-stream";
 		}
 
-		$size = $stat["size"];
-		$etag = sprintf("\"%x-%x-%x\"", $stat["ino"], $size, $stat["mtime"]);
-
-		$this->headers[] = "Last-Modified: " . self::lastModified($stat["mtime"]);
-		$this->headers[] = "Content-Type: " . $mimeType;
-		$this->headers[] = "Accept-Ranges: bytes";
-		$this->headers[] = "ETag: " . $etag;
-
-		$this->offset = 0;
-		$this->maxlen = -1;
-
-		if (!$this->setRange($size, $etag))
-			$this->headers[] = "Content-Length: " . $size;
+		$this->setHeaders($mimeType, $stat["size"], $stat["ino"], $stat["mtime"]);
 	}
 
 
