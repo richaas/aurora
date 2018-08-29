@@ -30,7 +30,7 @@ class mysql
 		$stmt = $this->conn->stmt_init();
 
 		if (!$stmt->prepare($sql))
-			throw new \Exception($stmt->error);
+			throw new \Exception($this->conn->error);
 
 		if (!is_array($params)) {
 			$params = func_get_args();
