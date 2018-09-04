@@ -70,4 +70,14 @@ class util
 
 		return $data;
 	}
+
+
+	public static function hash($filename, $algo, $raw=false)
+	{
+		$hash = hash_file($algo, $filename, $raw);
+		if ($hash === false)
+			throw new Exception(error_get_last()["message"]);
+
+		return $hash;
+	}
 }
