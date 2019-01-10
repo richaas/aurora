@@ -15,7 +15,7 @@ class authnrequest
 		return <<<XML
 <samlp:AuthnRequest
  AssertionConsumerServiceURL="$acsUrl"
- ID="$id"
+ ID="_$id"
  IssueInstant="$now"
  Version="2.0"
  xmlns:saml="urn:oasis:names:tc:SAML:2.0:assertion"
