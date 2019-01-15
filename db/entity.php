@@ -7,6 +7,10 @@ use lib\db;
 
 class entity
 {
+	const FOR_UPDATE = 1;
+	const FOR_SHARE  = 2;
+
+
 	protected function join(&$sql1, &$sql2, &$jc, $join, $target)
 	{
 		foreach($join as $key => $value) {
@@ -51,6 +55,9 @@ class entity
 					continue;
 				}
 
+				if (!isset($value->__alias))
+					continue;
+
 				$alias = $value->__alias;
 				unset($value->__alias);
 
@@ -80,7 +87,7 @@ class entity
 	}
 
 
-	public function select($id, $join=array(), $handleNotFound=false)
+	public function select($id, $join=array(), $handleNotFound=false, $flags=0)
 	{
 		$entity = $this->entity();
 
@@ -97,6 +104,11 @@ class entity
 
 		$sql2 = substr($sql2, 0, -4);
 
+		if ($flags & self::FOR_UPDATE)
+			$sql2 .= " FOR UPDATE";
+		if ($flags & self::FOR_SHARE)
+			$sql2 .= " LOCK IN SHARE MODE";
+
 		$res = db::conn()->query($sql1 . $sql2, $id);
 		if (count($res) < 1) {
 			if ($handleNotFound)
@@ -108,6 +120,18 @@ class entity
 		$this->storeResult($res[0]);
 
 		return $this;
+	}
+
+
+	public function selectForUpdate($id, $join=array(), $handleNotFound=false)
+	{
+		return $this->select($id, $join, $handleNotFound, self::FOR_UPDATE);
+	}
+
+
+	public function selectForShare($id, $join=array(), $handleNotFound=false)
+	{
+		return $this->select($id, $join, $handleNotFound, self::FOR_SHARE);
 	}
 
 
