@@ -8,11 +8,11 @@ class file
 	public $fp;
 
 
-	public function __construct($filename, $mode="r")
+	public function __construct($filename, $mode="r", $errmsg=NULL, $errcode=0)
 	{
 		$this->fp = fopen($filename, $mode);
 		if ($this->fp === false)
-			throw new \Exception(error_get_last()["message"]);
+			throw new \Exception($errmsg ?? error_get_last()["message"], $errcode);
 	}
 
 
