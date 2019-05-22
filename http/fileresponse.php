@@ -2,10 +2,13 @@
 
 namespace aurora\http;
 
+use aurora\file\file;
+use Exception;
+
 
 class fileresponse extends response
 {
-	protected $filename;
+	protected $file;
 	protected $offset;
 	protected $maxlen;
 
@@ -43,7 +46,7 @@ class fileresponse extends response
 
 			if ($start > $endMax) {
 				header("Content-Range: bytes */" . $size);
-				throw new \Exception("requested range not satisfiable", 416);
+				throw new Exception("requested range not satisfiable", 416);
 			}
 
 			$end = ($res[2] === "") ? $endMax : min((int)$res[2], $endMax);
@@ -88,13 +91,15 @@ class fileresponse extends response
 
 	public function __construct($filename, $status=200, $headers=array(), $mimeType=NULL)
 	{
-		$this->filename = $filename;
 		$this->status   = $status;
 		$this->headers  = $headers;
 
-		$stat = stat($filename);
-		if (!$stat || ($stat["mode"] & 0xf000) != 0x8000)
-			throw new \Exception("file not found", 404);
+		$this->file = new file($filename, "rb", "file not found", 404);
+
+		$stat = $this->file->stat();
+
+		if (($stat->mode & 0xf000) != 0x8000)
+			throw new Exception("file not found", 404);
 
 		if (!$mimeType) {
 			$mimeType = mime_content_type($filename);
@@ -102,7 +107,7 @@ class fileresponse extends response
 				$mimeType = "application/octet-stream";
 		}
 
-		$this->setHeaders($mimeType, $stat["size"], $stat["ino"], $stat["mtime"]);
+		$this->setHeaders($mimeType, $stat->size, $stat->ino, $stat->mtime);
 	}
 
 
@@ -111,12 +116,9 @@ class fileresponse extends response
 		if ($this->maxlen === 0)
 			return;
 
-		$out  = fopen("php://output", "wb");
-		$file = fopen($this->filename, "rb");
+		$out = new file("php://output", "wb");
 
-		stream_copy_to_stream($file, $out, $this->maxlen, $this->offset);
-
-		fclose($out);
-		fclose($file);
+		if (stream_copy_to_stream($this->file->fp, $out->fp, $this->maxlen, $this->offset) === false)
+			throw new Exception(error_get_last()["message"]);
 	}
 }

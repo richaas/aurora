@@ -14,26 +14,27 @@ class cryptofileresponse extends fileresponse
 
 	public function __construct($filename, $mimeType, $key, $status=200, $headers=array())
 	{
-		$this->filename = $filename;
 		$this->status   = $status;
 		$this->headers  = $headers;
 
-		$stat = @stat($this->filename);
-		if (!$stat) {
-			$this->filename .= "_";
+		if (!file_exists($filename)) {
+			$filename .= "_";
 			$this->key = $key;
-			$stat = stat($this->filename);
 		}
 
-		if (!$stat || ($stat["mode"] & 0xf000) != 0x8000)
+		$this->file = new file($filename, "rb", "file not found", 404);
+
+		$stat = $this->file->stat();
+
+		if (($stat->mode & 0xf000) != 0x8000)
 			throw new Exception("file not found", 404);
 
-		$size = $stat["size"];
+		$size = $stat->size;
 
 		if ($this->key)
 			$size -= aes::ivsize * (int)ceil($size / aes::blocksize);
 
-		$this->setHeaders($mimeType, $size, $stat["ino"], $stat["mtime"]);
+		$this->setHeaders($mimeType, $size, $stat->ino, $stat->mtime);
 
 		$this->headers[] = sprintf("X-Encrypted: %d", $this->key !== NULL);
 	}
@@ -51,8 +52,7 @@ class cryptofileresponse extends fileresponse
 		else
 			$bytes = $this->maxlen;
 
-		$out  = new file("php://output", "wb");
-		$file = new file($this->filename, "rb");
+		$out = new file("php://output", "wb");
 
 		if ($this->offset > 0) {
 
@@ -61,12 +61,12 @@ class cryptofileresponse extends fileresponse
 			$offset = aes::blocksize * $block;
 			$skip   = $this->offset - ($bsize * $block);
 
-			$file->seek($offset);
+			$this->file->seek($offset);
 		}
 		else
 			$skip = 0;
 
-		while ($bytes > 0 && strlen($data = $file->read(aes::blocksize))) {
+		while ($bytes > 0 && strlen($data = $this->file->read(aes::blocksize))) {
 
 			$data = aes::decrypt($data, $this->key, true);
 
