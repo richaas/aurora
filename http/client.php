@@ -5,7 +5,7 @@ namespace aurora\http;
 
 class client
 {
-	private $curl;
+	public $curl;
 	private $headers;
 	public $status;
 	public $content;
