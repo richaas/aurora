@@ -29,6 +29,12 @@ class message
 	}
 
 
+	public static function encodeWord($value)
+	{
+		return "=?utf-8?B?" . base64_encode($value) . "?=";
+	}
+
+
 	public function __construct($to=NULL, $subject=NULL, $from=NULL, $content=NULL)
 	{
 		$this->headers = array();
