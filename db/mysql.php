@@ -41,8 +41,14 @@ class mysql
 
 		foreach ($params as &$value) {
 
-			// todo: check type?
-			$bind[0] .= "s";
+			if (is_bool($value) || is_int($value))
+				$type = "i";
+			else if (is_float($value))
+				$type = "d";
+			else
+				$type = "s";
+
+			$bind[0] .= $type;
 			$bind[] = &$value;
 		}
 
