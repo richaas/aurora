@@ -47,9 +47,6 @@ class po2php
 			$id  = $this->escape($tr->getOriginal());
 			$msg = $this->escape($tr->getTranslation());
 
-			if ($msg === "")
-				continue;
-
 			if ($tr->getPlural() !== NULL) {
 
 				$pmsgs .= "\n\t\t'$id' => ['$msg'";
@@ -58,7 +55,7 @@ class po2php
 
 					$msg = $this->escape($ptr);
 
-					$pmsgs .= ($msg !== "") ? ", '$msg'" : ", NULL";
+					$pmsgs .= ", '$msg'";
 				}
 
 				$pmsgs .= "],";
