@@ -3,6 +3,7 @@
 namespace cmd\i18n;
 
 use aurora\file\util as futl;
+use aurora\i18n\util;
 use Gettext\Loader\PoLoader;
 
 
@@ -31,7 +32,7 @@ class po2js extends po2php
 
 		foreach ($trans->getTranslations() as $tr) {
 
-			if ($tr->isDisabled())
+			if ($tr->isDisabled() || !util::isTranslated($tr, $nplurals))
 				continue;
 
 			$id  = $this->escape($tr->getOriginal());
