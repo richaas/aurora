@@ -34,18 +34,16 @@ class po2js extends po2php
 			if ($tr->isDisabled())
 				continue;
 
-			$ptrs = $tr->getPluralTranslations();
-
 			$id  = $this->escape($tr->getOriginal());
 			$msg = $this->escape($tr->getTranslation());
 
 			$msgs .= "\n\t'$id': ";
 
-			if (count($ptrs) > 0) {
+			if ($tr->getPlural() !== NULL) {
 
 				$msgs .= "['$msg'";
 
-				foreach ($ptrs as $ptr) {
+				foreach ($tr->getPluralTranslations() as $ptr) {
 
 					$msg = $this->escape($ptr);
 
