@@ -6,6 +6,7 @@ namespace aurora\i18n;
 class trans
 {
 	private $msgs = [];
+	private $pmsgs = [];
 	private $res;
 
 
@@ -48,7 +49,7 @@ class trans
 	{
 		$idx = (int)$this->res->plural((int)$num);
 
-		$msg = $this->res->msgs[$id][$idx] ?? ((int)$num === 1 ? $id : $idp);
+		$msg = $this->res->pmsgs[$id][$idx] ?? ((int)$num === 1 ? $id : $idp);
 
 		$args = func_get_args();
 
