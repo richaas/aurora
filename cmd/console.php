@@ -100,7 +100,7 @@ class console
 		$argc = count($args);
 
 		if ($argc < $rm->getNumberOfRequiredParameters() ||
-		    $argc > $rm->getNumberOfParameters())
+		    ($argc > $rm->getNumberOfParameters() && !$rm->isVariadic()))
 			throw new Exception(self::usage($cmd, $rm->getParameters()));
 
 		call_user_func_array(array(new $class, "exec"), $args);
