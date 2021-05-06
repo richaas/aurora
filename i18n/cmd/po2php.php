@@ -3,6 +3,7 @@
 namespace cmd\i18n;
 
 use aurora\file\util as futl;
+use aurora\i18n\util;
 use Exception;
 use Gettext\Loader\PoLoader;
 
@@ -34,14 +35,16 @@ class po2php
 		$trans = @$loader->loadFile($poFile);
 
 		$class  = basename($phpFile, ".php");
-		$plural = $this->checkPlural($trans->getHeaders()->getPluralForm()[1] ?? "n != 1");
+		$plurForm = $trans->getHeaders()->getPluralForm();
+		$nplurals = (int)($plurForm[0] ?? 2);
+		$plural = $this->checkPlural($plurForm[1] ?? "n != 1");
 		$plural = str_replace("n", "\$num", $plural);
 		$msgs   = "";
 		$pmsgs  = "";
 
 		foreach ($trans->getTranslations() as $tr) {
 
-			if ($tr->isDisabled())
+			if ($tr->isDisabled() || !util::isTranslated($tr, $nplurals))
 				continue;
 
 			$id  = $this->escape($tr->getOriginal());
