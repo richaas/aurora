@@ -2,6 +2,7 @@
 
 namespace cmd\i18n;
 
+use aurora\i18n\util;
 use Exception;
 use Gettext\Loader\PoLoader;
 
@@ -30,6 +31,8 @@ class pocheck
 
 	private function check($ref, $def, $file)
 	{
+		$nplurals = (int)($def->getHeaders()->getPluralForm()[0] ?? 2);
+
 		foreach ($ref->getTranslations() as $tr) {
 
 			if ($tr->isDisabled())
@@ -40,6 +43,8 @@ class pocheck
 
 			if ($_tr === NULL || $_tr->isDisabled())
 				$this->error($file, $id, "missing");
+			else if (!util::isTranslated($_tr, $nplurals))
+				$this->error($file, $id, "not translated");
 			else if ($_tr->getPlural() !== $tr->getPlural())
 				$this->error($file, $id, "plural mismatch");
 		}
