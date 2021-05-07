@@ -40,7 +40,6 @@ class po2php
 		$plural = $this->checkPlural($plurForm[1] ?? "n != 1");
 		$plural = str_replace("n", "\$num", $plural);
 		$msgs   = "";
-		$pmsgs  = "";
 
 		foreach ($trans->getTranslations() as $tr) {
 
@@ -50,21 +49,23 @@ class po2php
 			$id  = $this->escape($tr->getOriginal());
 			$msg = $this->escape($tr->getTranslation());
 
+			$msgs .= "\n\t\t'$id' => ";
+
 			if ($tr->getPlural() !== NULL) {
 
-				$pmsgs .= "\n\t\t'$id' => ['$msg'";
+				$msgs .= "['$msg'";
 
 				foreach ($tr->getPluralTranslations() as $ptr) {
 
 					$msg = $this->escape($ptr);
 
-					$pmsgs .= ", '$msg'";
+					$msgs .= ", '$msg'";
 				}
 
-				$pmsgs .= "],";
+				$msgs .= "],";
 			}
 			else {
-				$msgs .= "\n\t\t'$id' => '$msg',";
+				$msgs .= "'$msg',";
 			}
 		}
 
@@ -77,8 +78,6 @@ namespace lang;
 class $class
 {
 	public \$msgs = [$msgs
-	];
-	public \$pmsgs = [$pmsgs
 	];
 
 
