@@ -21,8 +21,8 @@ class trans
 	{
 		$msg = str_replace("%%", "%% ", $msg);
 
-		for ($idx=1; $idx<count($args); $idx++)
-			$msg = str_replace("%$idx", (string)$args[$idx], $msg);
+		foreach ($args as $idx => $arg)
+			$msg = str_replace("%$idx", (string)$arg, $msg);
 
 		return str_replace("%% ", "%", $msg);
 	}
@@ -34,24 +34,22 @@ class trans
 	}
 
 
-	public function gettext($id)
+	public function gettext($id, ...$args)
 	{
 		$msg = $this->res->msgs[$id][0] ?? $id;
 
-		$args = func_get_args();
-
-		return count($args) > 1 ? $this->format($msg, $args) : $msg;
+		return count($args) > 0 ? $this->format($msg, $args) : $msg;
 	}
 
 
-	public function ngettext($id, $idp, $num)
+	public function ngettext($id, $idp, $num, ...$args)
 	{
 		$idx = (int)$this->res->plural((int)$num);
 
 		$msg = $this->res->msgs[$id][$idx] ?? ((int)$num === 1 ? $id : $idp);
 
-		$args = func_get_args();
+		array_unshift($args, $num);
 
-		return $this->format($msg, array_slice($args, 1));
+		return $this->format($msg, $args);
 	}
 }
