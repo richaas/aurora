@@ -49,24 +49,16 @@ class po2php
 			$id  = $this->escape($tr->getOriginal());
 			$msg = $this->escape($tr->getTranslation());
 
-			$msgs .= "\n\t\t'$id' => ";
+			$msgs .= "\n\t\t'$id' => ['$msg'";
 
-			if ($tr->getPlural() !== NULL) {
+			foreach ($tr->getPluralTranslations() as $ptr) {
 
-				$msgs .= "['$msg'";
+				$msg = $this->escape($ptr);
 
-				foreach ($tr->getPluralTranslations() as $ptr) {
-
-					$msg = $this->escape($ptr);
-
-					$msgs .= ", '$msg'";
-				}
-
-				$msgs .= "],";
+				$msgs .= ", '$msg'";
 			}
-			else {
-				$msgs .= "'$msg',";
-			}
+
+			$msgs .= "],";
 		}
 
 		@futl::file_put_contents($phpFile, <<<EOT

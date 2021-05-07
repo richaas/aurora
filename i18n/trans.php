@@ -36,7 +36,7 @@ class trans
 
 	public function gettext($id)
 	{
-		$msg = $this->res->msgs[$id] ?? $id;
+		$msg = $this->res->msgs[$id][0] ?? $id;
 
 		$args = func_get_args();
 
