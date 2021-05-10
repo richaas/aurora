@@ -46,7 +46,8 @@ class po2php
 			if ($tr->isDisabled() || !util::isTranslated($tr, $nplurals))
 				continue;
 
-			$id  = $this->escape($tr->getOriginal());
+			$id  = $this->escape($tr->getContext() === NULL ?
+					     $tr->getOriginal() : $tr->getId());
 			$msg = $this->escape($tr->getTranslation());
 
 			$msgs .= "\n\t\t'$id' => ['$msg'";

@@ -15,15 +15,31 @@ class pocheck
 	private $warnc = 0;
 
 
-	private function error($file, $id, $msg)
+	private function getId($tr)
 	{
+		$id  = $tr->getOriginal();
+		$ctx = $tr->getContext();
+
+		if ($ctx !== NULL)
+			$id .= " [$ctx]";
+
+		return $id;
+	}
+
+
+	private function error($file, $tr, $msg)
+	{
+		$id = $this->getId($tr);
+
 		echo "$file: \x1b[31m$id\x1b[0m ($msg)\n";
 		$this->errc++;
 	}
 
 
-	private function warn($file, $id, $msg)
+	private function warn($file, $tr, $msg)
 	{
+		$id = $this->getId($tr);
+
 		echo "$file: \x1b[33m$id\x1b[0m ($msg)\n";
 		$this->warnc++;
 	}
@@ -38,15 +54,14 @@ class pocheck
 			if ($tr->isDisabled())
 				continue;
 
-			$id  = $tr->getOriginal();
-			$_tr = $def->find(NULL, $id);
+			$_tr = $def->find($tr->getContext(), $tr->getOriginal());
 
 			if ($_tr === NULL || $_tr->isDisabled())
-				$this->error($file, $id, "missing");
+				$this->error($file, $tr, "missing");
 			else if (!util::isTranslated($_tr, $nplurals))
-				$this->error($file, $id, "not translated");
+				$this->error($file, $tr, "not translated");
 			else if ($_tr->getPlural() !== $tr->getPlural())
-				$this->error($file, $id, "plural mismatch");
+				$this->error($file, $tr, "plural mismatch");
 		}
 
 		foreach ($def->getTranslations() as $tr) {
@@ -54,11 +69,10 @@ class pocheck
 			if ($tr->isDisabled())
 				continue;
 
-			$id  = $tr->getOriginal();
-			$_tr = $ref->find(NULL, $id);
+			$_tr = $ref->find($tr->getContext(), $tr->getOriginal());
 
 			if ($_tr === NULL || $_tr->isDisabled())
-				$this->warn($file, $id, "obsolete");
+				$this->warn($file, $tr, "obsolete");
 		}
 	}
 

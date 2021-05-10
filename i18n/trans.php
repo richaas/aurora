@@ -42,6 +42,14 @@ class trans
 	}
 
 
+	public function pgettext($ctx, $id, ...$args)
+	{
+		$msg = $this->res->msgs["$ctx\x04$id"][0] ?? $id;
+
+		return count($args) > 0 ? $this->format($msg, $args) : $msg;
+	}
+
+
 	public function ngettext($id, $idp, $num, ...$args)
 	{
 		$idx = (int)$this->res->plural((int)$num);
