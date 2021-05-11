@@ -10,6 +10,9 @@ class util
 		if (!$tr->isTranslated())
 			return false;
 
+		if ($tr->getFlags()->has("fuzzy"))
+			return false;
+
 		if ($tr->getPlural() === NULL)
 			return true;
 
