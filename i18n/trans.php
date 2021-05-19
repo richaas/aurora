@@ -20,9 +20,12 @@ class trans
 	private function format($msg, $args)
 	{
 		$msg = str_replace("%%", "%% ", $msg);
+		$idx = 1;
 
-		foreach ($args as $idx => $arg)
+		foreach ($args as $arg) {
 			$msg = str_replace("%$idx", (string)$arg, $msg);
+			$idx++;
+		}
 
 		return str_replace("%% ", "%", $msg);
 	}
