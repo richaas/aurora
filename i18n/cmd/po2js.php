@@ -24,7 +24,7 @@ class po2js extends po2php
 
 		$trans = @$loader->loadFile($poFile);
 
-		$lang     = basename($jsFile, ".js");
+		$lang     = str_replace("_", "-", basename($jsFile, ".js"));
 		$plurForm = $trans->getHeaders()->getPluralForm();
 		$nplurals = (int)($plurForm[0] ?? 2);
 		$plural   = $this->checkPlural($plurForm[1] ?? "n != 1");

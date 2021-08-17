@@ -11,7 +11,7 @@ class trans
 
 	public function __construct($lang)
 	{
-		$class = "\\lang\\" . preg_replace("/[^\w]/", "", $lang);
+		$class = "\\lang\\" . preg_replace("/[^\w]/", "", str_replace("-", "_", $lang));
 
 		$this->res = class_exists($class) ? new $class : $this;
 	}
