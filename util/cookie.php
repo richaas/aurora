@@ -5,7 +5,7 @@ namespace aurora\util;
 
 class cookie
 {
-	public static function set($name, $value="", $lifetime=0, $path="", $samesite="Strict",
+	public static function set($name, $value="", $lifetime=0, $path="", $samesite="Lax",
 				   $domain="", $secure=true, $httponly=true)
 	{
 		return setcookie($name, $value, ["expires"  => $lifetime ? time() + $lifetime : 0,
