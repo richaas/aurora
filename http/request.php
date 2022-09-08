@@ -40,6 +40,15 @@ class request extends param
 				if ($param !== NULL)
 					$this->param = $param;
 				break;
+
+			case "multipart/form-data":
+				if (!isset($_REQUEST["_json"]))
+					break;
+
+				$param = json_decode($_REQUEST["_json"]);
+				if ($param !== NULL)
+					$this->param = $param;
+				break;
 			}
 		}
 	}
