@@ -24,7 +24,7 @@ class po2js extends po2php
 
 		$trans = @$loader->loadFile($poFile);
 
-		$lang     = str_replace("_", "-", basename($jsFile, ".js"));
+		$lang     = basename($poFile, ".po");
 		$plurForm = $trans->getHeaders()->getPluralForm();
 		$nplurals = (int)($plurForm[0] ?? 2);
 		$plural   = $this->checkPlural($plurForm[1] ?? "n != 1");
@@ -60,7 +60,7 @@ class po2js extends po2php
 		}
 
 		@futl::file_put_contents($jsFile, <<<EOT
-export default {
+window.i18nMessages = {
 	'': {
 		'language': '$lang',
 		'plural-forms': 'nplurals=$nplurals; plural=$plural;'
