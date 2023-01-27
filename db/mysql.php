@@ -40,7 +40,7 @@ class mysql
 		if ($this->conn->connect_errno)
 			throw new Exception($this->conn->connect_error);
 
-		$this->conn->set_charset("utf8");
+		$this->conn->set_charset("utf8mb4");
 		$this->conn->autocommit(false);
 	}
 
