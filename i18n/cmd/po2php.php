@@ -11,6 +11,7 @@ use Gettext\Loader\PoLoader;
 class po2php
 {
 	const desc = "Create php translation from po";
+	const assign = " => ";
 
 
 	protected function checkPlural($plural)
@@ -34,11 +35,9 @@ class po2php
 
 		$trans = @$loader->loadFile($poFile);
 
-		$class  = basename($phpFile, ".php");
 		$plurForm = $trans->getHeaders()->getPluralForm();
 		$nplurals = (int)($plurForm[0] ?? 2);
 		$plural = $this->checkPlural($plurForm[1] ?? "n != 1");
-		$plural = str_replace("n", "\$num", $plural);
 		$msgs   = "";
 
 		foreach ($trans->getTranslations() as $tr) {
@@ -50,7 +49,7 @@ class po2php
 					     $tr->getOriginal() : $tr->getId());
 			$msg = $this->escape($tr->getTranslation());
 
-			$msgs .= "\n\t\t'$id' => ['$msg'";
+			$msgs .= "\n\t\t'$id'" . static::assign . "['$msg'";
 
 			foreach ($tr->getPluralTranslations() as $ptr) {
 
@@ -62,7 +61,16 @@ class po2php
 			$msgs .= "],";
 		}
 
-		@futl::file_put_contents($phpFile, <<<EOT
+		@futl::file_put_contents($phpFile, $this->print($phpFile, $plural, $msgs));
+	}
+
+
+	protected function print($file, $plural, $msgs)
+	{
+		$plural = str_replace("n", "\$num", $plural);
+		$class  = basename($file, ".php");
+
+		return <<<EOT
 <?php
 
 namespace lang;
@@ -80,6 +88,6 @@ class $class
 	}
 }
 
-EOT);
+EOT;
 	}
 }
