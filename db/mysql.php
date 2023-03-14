@@ -18,7 +18,7 @@ class mysql
 		case 1213: throw new DeadlockException($obj->error);
 		case 1048: throw new Exception(preg_replace("/Column '(\w+)'/", "field $1", $obj->error), 400);
 		case 1062: throw new Exception(preg_replace("/Duplicate entry '(.*)' for key.+/",
-							    "duplicate entry: $1", $obj->error), 400);
+							    "duplicate entry: $1", $obj->error), 403);
 		case 1264: throw new Exception(preg_replace("/Out of range value for column '(\w+)'.+/",
 							    "out of range value for field $1", $obj->error), 400);
 		case 1366: throw new Exception(preg_replace("/Incorrect (.+) column `\w+`\.`(\w+)`\.`(\w+)` at row .+/",
