@@ -23,6 +23,8 @@ class mysql
 							    "out of range value for field $1", $obj->error), 400);
 		case 1366: throw new Exception(preg_replace("/Incorrect (.+) column `\w+`\.`(\w+)`\.`(\w+)` at row .+/",
 							    "incorrect $1 field $2.$3", $obj->error), 400);
+		case 1406: throw new Exception(preg_replace("/Data too long for column '(\w+)' at row .+/",
+							    "data too long for field $1", $obj->error), 400);
 		case 1451: throw new Exception(preg_replace("/.+ key constraint fails \(`\w+`\.`(\w+)`.+/",
 							    "$1 child records exist", $obj->error), 403);
 		case 1452: throw new Exception(preg_replace("/.+ REFERENCES `(\w+)` .+/",
