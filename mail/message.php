@@ -17,15 +17,7 @@ class message
 
 	private static function encode($value)
 	{
-		if (!is_array($value))
-			return $value;
-
-		$list = "";
-
-		foreach ($value as $entry)
-			$list .= "$entry, ";
-
-		return substr($list, 0, -2);
+		return is_array($value) ? implode(", ", $value) : $value;
 	}
 
 
@@ -85,7 +77,14 @@ class message
 
 	public function setFrom($from)
 	{
-		$this->from = $from;
+		if (is_array($from)) {
+			$this->setHeader("From", "$from[0] <$from[1]>");
+			$this->from = $from[1];
+		}
+		else {
+			$this->setHeader("From", $from);
+			$this->from = $from;
+		}
 	}
 
 
@@ -100,16 +99,15 @@ class message
 	}
 
 
+	public function _send()
+	{
+		return mail($this->to, $this->subject, $this->content, $this->headers, "-f {$this->from}");
+	}
+
+
 	public function send()
 	{
-		$headers = "";
-
-		foreach ($this->headers as $name => $value)
-			$headers .= "$name: $value\r\n";
-
-		$params = "-F '' -f " . $this->from;
-
-		if (!mail($this->to, $this->subject, $this->content, $headers, $params))
+		if (!$this->_send())
 			throw new Exception("unable to send mail message");
 	}
 }
