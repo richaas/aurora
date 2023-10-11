@@ -21,12 +21,6 @@ class message
 	}
 
 
-	public static function encodeWord($value)
-	{
-		return "=?utf-8?B?" . base64_encode($value) . "?=";
-	}
-
-
 	public function __construct($to=NULL, $subject=NULL, $from=NULL, $content=NULL)
 	{
 		$this->headers = array();
@@ -53,7 +47,8 @@ class message
 
 	public function setSubject($subject)
 	{
-		$this->subject = $subject;
+		mb_internal_encoding("UTF-8");
+		$this->subject = mb_encode_mimeheader($subject, "UTF-8", "B", "\r\n", 9);
 	}
 
 
