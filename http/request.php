@@ -25,7 +25,7 @@ class request extends param
 		$this->path    = $path ? $path : $uri;
 		$this->uri     = $uri;
 		$this->param   = (object)$_REQUEST;
-		$this->host    = $_SERVER["HTTP_HOST"];
+		$this->host    = $_SERVER["HTTP_HOST"] ?? NULL;
 		$this->scheme  = (isset($_SERVER["HTTPS"]) && $_SERVER["HTTPS"] !== "off") ? "https" : "http";
 		$this->referer = isset($_SERVER["HTTP_REFERER"]) ? $_SERVER["HTTP_REFERER"] : NULL;
 
