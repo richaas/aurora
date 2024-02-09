@@ -38,6 +38,8 @@ class mysql
 
 	function __construct($host, $user, $pass, $db)
 	{
+		mysqli_report(MYSQLI_REPORT_OFF);
+
 		$this->conn = new mysqli($host, $user, $pass, $db);
 		if ($this->conn->connect_errno)
 			throw new Exception($this->conn->connect_error);
